@@ -6,23 +6,24 @@ from pyevolve import Statistics
 from pyevolve import DBAdapters
 import pyevolve
 
+from math import sin
+
 # This function is the evaluation function, we want
 # to give high score to more zero'ed chromosomes
 def eval_func(chromosome):
-   x_val = chromosome.getDecimal()
 
-   score = -1.0 + x_val * (3/4194303)
-   
-   return score
+	for xval in chromosome:
+		score = xval * sin(31.4*xval) + 1
+	
+	return score
 
 # Enable the pyevolve logging system
 pyevolve.logEnable()
 
 # Genome instance, 1D List of 50 elements
-genome = G1DList.G1DList(22)
-
+genome = G1DList.G1DList(50)
 # Sets the range max and min of the 1D List
-#genome.setParams(rangemin=0, rangemax=10)
+genome.setParams(rangemin=-1, rangemax=2)
 
 # The evaluator function (evaluation function)
 genome.evaluator.set(eval_func)
