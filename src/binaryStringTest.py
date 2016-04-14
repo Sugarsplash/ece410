@@ -10,11 +10,10 @@ from math import sin, pi
 # to give high score to more zero'ed chromosomes
 def eval_func(chromosome):
 	x = 0.0
-
 	# iterate over the chromosome
-	power = len(chromosome)
-	for i in range(power):
-		if chromosome[i] == 1:
+	power = len(chromosome) -1
+	for i in range(len(chromosome)):
+		if chromosome[power-i] == 1:
 			x = x + 2**(power-1)
 
 	xval = -1.0 + float(x) * (3.0/float((2**22)-1))
