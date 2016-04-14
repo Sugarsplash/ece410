@@ -14,7 +14,7 @@ def eval_func(chromosome):
 	power = len(chromosome) -1
 	for i in range(len(chromosome)):
 		if chromosome[power-i] == 1:
-			x = x + 2**(power-1)
+			x = x + 2**(power-i)
 
 	xval = -1.0 + float(x) * (3.0/float((2**22)-1))
 
