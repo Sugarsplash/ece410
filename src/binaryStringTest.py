@@ -48,3 +48,10 @@ ga.evolve(freq_stats=10)
 # Best individual
 best = ga.bestIndividual()
 print best
+
+def f(x):
+	return x * sin(10*pi*x) + 1.0
+
+x = -1.0 + best.getDecimal() * (3.0/float((2**22)-1))
+
+print f(x)
