@@ -2,6 +2,7 @@ from pyevolve import G1DBinaryString, Scaling
 from pyevolve import GSimpleGA
 from pyevolve import Selectors
 from pyevolve import Mutators
+from pyevolve import Consts
 
 from math import sin, pi
 
@@ -9,13 +10,14 @@ from math import sin, pi
 # to give high score to more zero'ed chromosomes
 def eval_func(chromosome):
 	x = 0.0
+
 	# iterate over the chromosome
 	power = len(chromosome)
 	for i in range(power):
 		if chromosome[i] == 1:
 			x = x + 2**(power-1)
 
-	xval = 1.0 + x * (3/2**22 - 1)
+	xval = -1.0 + float(x) * (3.0/float((2**22)-1))
 
 	score = xval * sin(10*pi*xval) + 1.0
 
@@ -23,6 +25,7 @@ def eval_func(chromosome):
 
 # Genome instance
 genome = G1DBinaryString.G1DBinaryString(22)
+genome.setParams(rangemin=-1, rangemax=2)
 
 # The evaluator function (objective function)
 genome.evaluator.set(eval_func)
@@ -31,12 +34,13 @@ genome.mutator.set(Mutators.G1DBinaryStringMutatorFlip)
 # Genetic Algorithm Instance
 ga = GSimpleGA.GSimpleGA(genome)
 ga.selector.set(Selectors.GTournamentSelector)
+ga.minimax = Consts.minimaxType["maximize"]
 
 #Change scaling method
 pop = ga.getPopulation()
 pop.scaleMethod.set(Scaling.SaturatedScaling)
 
-ga.setGenerations(100)
+ga.setGenerations(200)
 
 # Do the evolution, with stats dump
 # frequency of 10 generations
