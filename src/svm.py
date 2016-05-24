@@ -16,7 +16,7 @@ hist_train = np.array(hist['Adj Close'].tolist())
 date_start = date.datetime(2006, 6, 28)
 date_stop = date.datetime(2011, 6, 20)
 hist = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
-hist_test = (hist['Adj Close'].tolist())
+hist_test = np.array(hist['Adj Close'].tolist())
 
 sma_6 = ta.SMA(hist_train, timeperiod=6)
 sma_65 = ta.SMA(hist_train, timeperiod=65)
