@@ -12,11 +12,19 @@ date_stop = date.datetime(2006, 6, 27)
 hist = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
 hist_train = np.array(hist['Adj Close'].tolist())
 
+hist2 = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
+hist_High = np.array(hist['High'].tolist())
+
+hist3 = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
+hist_low = np.array(hist['Low'].tolist())
+
+hist4 = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
+hist_close = np.array(hist['Close'].tolist())
+
 # History for testing the SVM
 date_start = date.datetime(2006, 6, 28)
 date_stop = date.datetime(2011, 6, 20)
 hist = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
-hist_test = np.array(hist['Adj Close'].tolist())
 
 sma_5 = ta.SMA(hist_train, timeperiod=5)
 sma_60 = ta.SMA(hist_train, timeperiod=60)
@@ -36,7 +44,7 @@ for i in range(len(hist_train)):
         #need to skip first crossover
         buy_day.append(i)
         buy_value.append(hist_train[i])
-        print "Long: Day " + str(i) + " Value = " + str(hist_train[i])
+        #print "Long: Day " + str(i) + " Value = " + str(hist_train[i])
         crossover = True
 
     elif ( (sma_5[i] < sma_60[i]) and
@@ -44,7 +52,7 @@ for i in range(len(hist_train)):
 
         sell_day.append(i)
         sell_value.append(hist_train[i])
-        print "Exit: Day " + str(i) + " Value = " + str(hist_train[i])
+        #print "Exit: Day " + str(i) + " Value = " + str(hist_train[i])
         crossover = False
 
 
@@ -52,31 +60,42 @@ for i in range(len(hist_train)):
 #need Sum and avg of return, earning(,) and loss...(oxford comma or no?)
 #need success rate and others but fuck it.
 trades = []
-success = 0
-fail = 0
+returns = [] #raw
+success = 0 #number of winning trades
+successVal = 0 #total winnings
+fail = 0    #number of loosing trades
+failVal = 0 #total losses
 
 for buy, sell in zip(buy_value, sell_value): 
     trades.append(sell - buy)
+    returns.append(float(sell - buy)/float(buy))
 
-for result in trades:
-    print "Trade: " + str(result)
+for result, ret in zip(trades, returns):
+    #print "Trade: " + str(result)
     if result > 0:
         success = success + 1
+        successVal = successVal + result
     else:
         fail = fail + 1
+        failVal = failVal + result
 
 winRate = float(success)/float(success + fail)
+avgWin = float(successVal)/float(success)
+avgLoss = float(failVal)/float(fail)
+avgRet = float(sum(returns))/float(sum(buy_value))
 
-#sanity check:
-#print "Win: " + str(success) + " Lose: " + str(fail) + " Total: " + str(len(trades))
-#print str(winRate)
-
-
-
+#for comparison with table 2 of paper:
+print "Sum Return: " + str(sum(returns))
+print "Avg Return: " + str(avgRet)
+print "Avg Earning: " + str(avgWin)
+print "Avg Loss: " + str(avgLoss)
+print "Sum Earning: " + str(successVal)
+print "Sum Loss: " + str(failVal)
+print "Success Rate: " + str(winRate)
 
 
 #Lets paint happy figures
-#plt.plot(hist_train, 'r-', label='Raw')
+plt.plot(hist_train, 'r-', label='Raw')
 plt.plot(sma_5, 'g-', label='SMA = 5')
 plt.plot(sma_60, 'b-', label='SMA = 60')
 for each in buy_day:
@@ -88,3 +107,21 @@ plt.legend(loc='upper left')
 plt.xlabel("Trading Days")
 plt.ylabel("Adj Close")
 plt.show()
+
+
+#begin svm work for part 2
+#first construct technical indicators to classify svm
+#we need RAVI, ADX, K&D, RSI, MACD
+
+ravi = []
+sma_7 = ta.SMA(hist_train, timeperiod=7)
+sma_65 = ta.SMA(hist_train, timeperiod=65)
+
+for s, l in zip(sma_7, sma_65):
+    raviVal =abs(100 * (float(s) - float(l)) / l)
+    ravi.append(raviVal)
+
+adx = []
+
+
+
