@@ -26,6 +26,16 @@ hist_close = np.array(hist['Close'].tolist())
 date_start = date.datetime(2006, 6, 28)
 date_stop = date.datetime(2011, 6, 20)
 hist = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
+hist_test = np.array(hist['Adj Close'].tolist())
+
+hist5 = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
+hist_highT = np.array(hist['High'].tolist())
+
+hist6 = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
+hist_lowT = np.array(hist['Low'].tolist())
+
+hist7 = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
+hist_closeT = np.array(hist['Close'].tolist())
 
 sma_5 = ta.SMA(hist_train, timeperiod=5)
 sma_60 = ta.SMA(hist_train, timeperiod=60)
@@ -122,9 +132,6 @@ for s, l in zip(sma_7, sma_65):
     raviVal =abs(100 * (float(s) - float(l)) / l)
     ravi.append(raviVal)
 
-tp = 14
-x = 0
-
 adx = ta.ADX(hist_high, hist_low, hist_close, timeperiod=14)
 
 slowk, slowd = ta.STOCH(hist_high, hist_low, hist_close, fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
@@ -132,8 +139,6 @@ slowk, slowd = ta.STOCH(hist_high, hist_low, hist_close, fastk_period=5, slowk_p
 rsi = ta.RSI(hist_close, timeperiod=14)
 
 macd, macdsignal, macdhist = ta.MACD(hist_close, fastperiod=12, slowperiod=26, signalperiod=9)
-
-print len(ravi), len(adx), len(slowk), len(slowd), len(rsi), len(macd), len(macdsignal), len(macdhist), len(hist_train)
 
 trend = []
 #determine up or down trend
@@ -161,3 +166,55 @@ trainArray = np.nan_to_num(trainArray)
 clf = svm.SVC(gamma=0.001, C=100)
 
 clf.fit(trainArray, trend)
+
+#determine trend for test data set
+raviT = []
+sma_7T = ta.SMA(hist_train, timeperiod=7)
+sma_65T = ta.SMA(hist_train, timeperiod=65)
+
+for s, l in zip(sma_7T, sma_65T):
+    raviValT =abs(100 * (float(s) - float(l)) / l)
+    raviT.append(raviValT)
+
+adxT = ta.ADX(hist_highT, hist_lowT, hist_closeT, timeperiod=14)
+
+slowkT, slowdT = ta.STOCH(hist_highT, hist_lowT, hist_closeT, fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
+
+rsiT = ta.RSI(hist_closeT, timeperiod=14)
+
+macdT, macdsignalT, macdhistT = ta.MACD(hist_closeT, fastperiod=12, slowperiod=26, signalperiod=9)
+
+trendT = []
+#determine up or down trend
+for x in range(5, len(hist_test), 5):
+    if hist_test[x] > hist_test[x-5]:
+        trendT.append(1)
+        trendT.append(1)
+        trendT.append(1)
+        trendT.append(1)
+        trendT.append(1)
+    else:
+        trendT.append(0)
+        trendT.append(0)
+        trendT.append(0)
+        trendT.append(0)
+        trendT.append(0)
+
+trendT.append(1)
+
+
+predictArray = zip(raviT, adxT, slowkT, slowdT, rsiT, macdT, macdsignalT, macdhistT)
+
+predictArray = np.nan_to_num(predictArray)
+
+prediction = clf.predict(predictArray)
+
+score = 0
+
+for x in range(len(trendT)):
+    if trendT[x] == prediction[x]:
+        score = score + 1
+
+predictionRate = float(score)/float(len(prediction))
+
+print predictionRate
