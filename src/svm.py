@@ -13,7 +13,7 @@ hist = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
 hist_train = np.array(hist['Adj Close'].tolist())
 
 hist2 = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
-hist_High = np.array(hist['High'].tolist())
+hist_high = np.array(hist['High'].tolist())
 
 hist3 = pandas.DataReader(SYMBOL, 'yahoo', date_start, date_stop)
 hist_low = np.array(hist['Low'].tolist())
@@ -95,18 +95,18 @@ print "Success Rate: " + str(winRate)
 
 
 #Lets paint happy figures
-plt.plot(hist_train, 'r-', label='Raw')
-plt.plot(sma_5, 'g-', label='SMA = 5')
-plt.plot(sma_60, 'b-', label='SMA = 60')
-for each in buy_day:
-    plt.plot(each, hist_train[each], 'ro')
-for item in sell_day:
-    plt.plot(item, hist_train[item], 'bo')
-plt.xticks(range(0, len(hist_train), 100))
-plt.legend(loc='upper left')
-plt.xlabel("Trading Days")
-plt.ylabel("Adj Close")
-plt.show()
+#plt.plot(hist_train, 'r-', label='Raw')
+#plt.plot(sma_5, 'g-', label='SMA = 5')
+#plt.plot(sma_60, 'b-', label='SMA = 60')
+#for each in buy_day:
+#    plt.plot(each, hist_train[each], 'ro')
+#for item in sell_day:
+#    plt.plot(item, hist_train[item], 'bo')
+#plt.xticks(range(0, len(hist_train), 100))
+#plt.legend(loc='upper left')
+#plt.xlabel("Trading Days")
+#plt.ylabel("Adj Close")
+#plt.show()
 
 
 #begin svm work for part 2
@@ -121,7 +121,13 @@ for s, l in zip(sma_7, sma_65):
     raviVal =abs(100 * (float(s) - float(l)) / l)
     ravi.append(raviVal)
 
-adx = []
+tp = 14
+x = 0
 
+adx = ta.ADX(hist_high, hist_low, hist_close, timeperiod=14)
 
+slowk, slowd = ta.STOCH(hist_high, hist_low, hist_close, fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
 
+rsi = ta.RSI(hist_close, timeperiod=14)
+
+macd, macdsignal, macdhist = ta.MACD(hist_close, fastperiod=12, slowperiod=26, signalperiod=9)
