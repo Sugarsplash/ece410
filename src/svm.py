@@ -3,6 +3,7 @@ import datetime as date
 import matplotlib.pylab as plt
 import talib as ta
 import numpy as np
+from sklearn import svm
 
 SYMBOL = "600887.SS"
 
@@ -131,3 +132,32 @@ slowk, slowd = ta.STOCH(hist_high, hist_low, hist_close, fastk_period=5, slowk_p
 rsi = ta.RSI(hist_close, timeperiod=14)
 
 macd, macdsignal, macdhist = ta.MACD(hist_close, fastperiod=12, slowperiod=26, signalperiod=9)
+
+print len(ravi), len(adx), len(slowk), len(slowd), len(rsi), len(macd), len(macdsignal), len(macdhist), len(hist_train)
+
+trend = []
+#determine up or down trend
+for x in range(5, len(hist_train), 5):
+    if hist_train[x] > hist_train[x-5]:
+        trend.append(1)
+        trend.append(1)
+        trend.append(1)
+        trend.append(1)
+        trend.append(1)
+    else:
+        trend.append(0)
+        trend.append(0)
+        trend.append(0)
+        trend.append(0)
+        trend.append(0)
+
+trend.append(1)
+trend.append(1)
+
+trainArray = zip(ravi, adx, slowk, slowd, rsi, macd, macdsignal, macdhist)
+
+trainArray = np.nan_to_num(trainArray)
+
+clf = svm.SVC(gamma=0.001, C=100)
+
+clf.fit(trainArray, trend)
